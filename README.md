@@ -45,3 +45,33 @@ En Ubuntu, se pueden instalar con:
 apt install netcat 
 apt install telnet
 ```
+## Ejemplo
+
+- En la consola #1 (server): `./server`
+- En la consola #2 (client): `nc localhost 5000`. Si la conexión es exitosa, el procesa se queda esperando a recibir entrada de `stdin`.
+
+```bash
+$ nc localhost 5000
+SET manzana apple
+OK
+$ nc localhost 5000
+SET perro dog
+OK
+$ nc localhost 5000
+SET hola hello
+OK
+$ nc localhost 5000
+GET perro
+OK
+dog
+$ nc localhost 5000
+GET casa
+NOTFOUND
+$ nc localhost 5000
+DEL perro
+OK
+$ nc localhost 5000
+GET perro
+NOTFOUND
+$
+```
