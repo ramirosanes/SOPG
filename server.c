@@ -49,7 +49,7 @@ void process_command(int client_fd, const char *command)
 
         } else if (strcmp(token, "GET") == 0) {
             // Comando GET, misma logica que anterior
-            char *key = strtok(NULL, " ");
+            char *key = strtok(NULL, "\n");
             //Agrego este buffer porque me fallaba el sprintf de 4 argumentos (ni idea porque)
             char temp_buffer[MAX_BUFFER] = {0}; 
 
@@ -58,7 +58,7 @@ void process_command(int client_fd, const char *command)
                 if (file) {
                     fgets(temp_buffer, sizeof(temp_buffer), file); //Leo archivo anteriormente creado y guardo en buffer para responder
                     fclose(file);
-                    snprintf(buffer, sizeof(buffer)+5, "OK\n%s\n", temp_buffer); //Si no ponia +5 no funcionaba (no me compilaba aunque no hubiera manera de superar el tamaño del buffer pero bueno)
+                    snprintf(buffer, sizeof(buffer)+5, "OK\n%s", temp_buffer); //Si no ponia +5 no funcionaba (no me compilaba aunque no hubiera manera de superar el tamaño del buffer pero bueno)
                 } else {
                     if (errno == ENOENT) {
                         snprintf(buffer, sizeof(buffer), "NOTFOUND\n"); //Respuesta en caso de que no se encuentre la key
@@ -72,7 +72,7 @@ void process_command(int client_fd, const char *command)
 
         } else if (strcmp(token, "DEL") == 0) {
             // Comando DEL, misma lógica
-            char *key = strtok(NULL, " ");
+            char *key = strtok(NULL, "\n");
 
             if (key != NULL) {
                 if (remove(key) == 0) {
@@ -117,8 +117,6 @@ void handle_client(int client_fd)
   
   // Procesar el comando
   process_command(client_fd, buffer);
-  // Cierro conexion con cliente
-  close(client_fd);
 }
 
 int main(void) {
@@ -175,7 +173,19 @@ int main(void) {
         printf("server: conexion desde:  %s\n", ipClient);
 
         handle_client(client_fd);
+        // Cierro conexion con cliente
+        if (close(client_fd) < 0)
+            {
+            perror("Error closing client");
+            exit(EXIT_FAILURE);
+            }
     }
 
+    if (close(server_fd < 0))
+    {
+        perror("Error closing server");
+        exit(EXIT_FAILURE);
+    }
+    
     return EXIT_SUCCESS;
 }
